@@ -5,30 +5,37 @@
             [goog.events :as events]
             [goog.history.EventType :as EventType]
             [markdown.core :refer [md->html]]
-            [ajax.core :refer [GET POST]])
+            [ajax.core :refer [GET POST]]
+            [gravatar :refer [avatar-url]])
   (:import goog.History))
+
+(defn navbar-item
+  [title symbol url]
+  [:li {:class (when (= symbol (session/get :page)) "active")}
+   [:a {:href url} title]])
+
 
 (defn navbar []
   [:div.navbar.navbar-inverse.navbar-fixed-top
    [:div.container
     [:div.navbar-header
-     [:a.navbar-brand {:href "#/"} "myapp"]]
+     [:img {:src (avatar-url "merino.bailon@gmail.com" :size 50)}]]
     [:div.navbar-collapse.collapse
      [:ul.nav.navbar-nav
-      [:li {:class (when (= :home (session/get :page)) "active")}
-       [:a {:href "#/"} "Home"]]
-      [:li {:class (when (= :about (session/get :page)) "active")}
-       [:a {:href "#/about"} "About"]]]]]])
+      (navbar-item "Home" :home "#/")
+      (navbar-item "Projects" :projects "#/projects")
+      (navbar-item "About" :about "#/about")]]]])
 
 (defn about-page []
-  [:div "this is the story of glados... work in progress"])
+  [:div.container
+   [:h3 "Know more about the machine"]
+   [:p "...work in progress"]])
 
 (defn home-page []
   [:div.container
    [:div.jumbotron
-    [:h1 "Welcome to glados"]
-    [:p "Time to start building your site!"]
-    [:p [:a.btn.btn-primary.btn-lg {:href "http://luminusweb.net"} "Learn more »"]]]
+    [:h1 "Welcome to Glados"]
+    [:p "...in which I will experiment with Clojure"]]
    [:div.row
     [:div.col-md-12
      [:h2 "Welcome to ClojureScript"]]]
@@ -38,9 +45,15 @@
                [:div {:dangerouslySetInnerHTML
                       {:__html (md->html docs)}}]]])])
 
+(defn projects-page []
+  [:div.container
+   [:h2 "Projects"]
+   [:p "...work in progress"]])
+
 (def pages
   {:home #'home-page
-   :about #'about-page})
+   :about #'about-page
+   :projects #'projects-page})
 
 (defn page []
   [(pages (session/get :page))])
@@ -54,6 +67,9 @@
 
 (secretary/defroute "/about" []
   (session/put! :page :about))
+
+(secretary/defroute "/projects" []
+  (session/put! :page :projects))
 
 ;; -------------------------
 ;; History
@@ -80,5 +96,3 @@
   (hook-browser-navigation!)
   (session/put! :page :home)
   (mount-components))
-
-
