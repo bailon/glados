@@ -9,11 +9,12 @@
             [gravatar :refer [avatar-url]])
   (:import goog.History))
 
+
+;; UI Elements -----------------------------------------------------------------
 (defn navbar-item
   [title symbol url]
   [:li {:class (when (= symbol (session/get :page)) "active")}
    [:a {:href url} title]])
-
 
 (defn navbar []
   [:div.navbar.navbar-inverse.navbar-fixed-top
@@ -40,16 +41,18 @@
     [:div.col-md-12
      [:h2 "Welcome to ClojureScript"]]]
    (when-let [docs (session/get :docs)]
-             [:div.row
-              [:div.col-md-12
-               [:div {:dangerouslySetInnerHTML
-                      {:__html (md->html docs)}}]]])])
+     [:div.row
+      [:div.col-md-12
+       [:div {:dangerouslySetInnerHTML
+              {:__html (md->html docs)}}]]])])
 
 (defn projects-page []
   [:div.container
    [:h2 "Projects"]
    [:p "...work in progress"]])
 
+
+;; Navigation ------------------------------------------------------------------
 (def pages
   {:home #'home-page
    :about #'about-page
@@ -58,8 +61,8 @@
 (defn page []
   [(pages (session/get :page))])
 
-;; -------------------------
-;; Routes
+
+;; Routes ----------------------------------------------------------------------
 (secretary/set-config! :prefix "#")
 
 (secretary/defroute "/" []
@@ -71,21 +74,21 @@
 (secretary/defroute "/projects" []
   (session/put! :page :projects))
 
-;; -------------------------
-;; History
+
+;; History ---------------------------------------------------------------------
 ;; must be called after routes have been defined
 (defn hook-browser-navigation! []
   (doto (History.)
-        (events/listen
-          EventType/NAVIGATE
-          (fn [event]
-              (secretary/dispatch! (.-token event))))
-        (.setEnabled true)))
+    (events/listen
+     EventType/NAVIGATE
+     (fn [event]
+       (secretary/dispatch! (.-token event))))
+    (.setEnabled true)))
 
-;; -------------------------
-;; Initialize app
+
+;; Initialize ------------------------------------------------------------------
 (defn fetch-docs! []
-      (GET "/docs" {:handler #(session/put! :docs %)}))
+  (GET "/docs" {:handler #(session/put! :docs %)}))
 
 (defn mount-components []
   (reagent/render-component [#'navbar] (.getElementById js/document "navbar"))
