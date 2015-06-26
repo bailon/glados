@@ -29,17 +29,16 @@
 
 (defn about-page []
   [:div.container
-   [:h3 "Know more about the machine"]
+   [:h3 "About"]
    [:p "...work in progress"]])
 
 (defn home-page []
   [:div.container
    [:div.jumbotron
-    [:h1 "Welcome to Glados"]
+    [:h1 "Glados Control System"]
+    [:hr]
     [:p "...in which I will experiment with Clojure"]]
-   [:div.row
-    [:div.col-md-12
-     [:h2 "Welcome to ClojureScript"]]]
+
    (when-let [docs (session/get :docs)]
      [:div.row
       [:div.col-md-12
